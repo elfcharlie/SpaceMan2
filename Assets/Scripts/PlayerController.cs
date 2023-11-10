@@ -160,6 +160,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
     void SetPlayingVariables(){
         sideSlowdownFactor = 4f;
         acceleration = 2f;
