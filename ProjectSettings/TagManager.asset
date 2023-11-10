@@ -7,6 +7,9 @@ TagManager:
   - Object
   - Platform
   - StartPlatform
+  - FinishPlatform
+  - Rocket
+  - RocketFinish
   layers:
   - Default
   - TransparentFX

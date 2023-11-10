@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     public Camera cam;
 
     private const float baseGravity = 0.2f;
-    private float currentSpeed = 0f;
+    private float currentSpeed = 0f;                        // Positive means going down
     private bool isInCollision = false;
     public float acceleration = 0.4f;
     public float sideSlowdownFactor = 1f;
@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private Collider2D collider2D;
     private AudioSource audio;
     private GameObject startPlatform;
+    private GameObject finishPlatform;
 
     // TEST-Variables
     public bool testBool = false;
@@ -41,6 +42,7 @@ public class PlayerController : MonoBehaviour
     {
         START,
         PLAYING,
+        FINISH,
     }
 
     void Start()
@@ -57,6 +59,7 @@ public class PlayerController : MonoBehaviour
         rightScreenSide = cam.ScreenToWorldPoint(new Vector3(Screen.width/2, 0f, 0f)).x;
 
         startPlatform = GameObject.FindGameObjectWithTag("StartPlatform");
+        finishPlatform = GameObject.FindGameObjectWithTag("FinishPlatform");
 
     }
 
@@ -66,9 +69,19 @@ public class PlayerController : MonoBehaviour
         {
             HandleStart();
         }
+        else if (currentState == States.FINISH)
+        {
+            HandleFinish();
+        }
         HandleFalling();
         HandleSideMovement();
         HandleAnimations();
+
+        if(Input.GetKey("o"))
+        {
+            currentState = States.FINISH;
+        }
+
         
     }
 
@@ -159,6 +172,21 @@ public class PlayerController : MonoBehaviour
             SetPlayingVariables();
         }
     }
+    
+    void HandleFinish()
+    {
+        Vector2 bottomCollider2DEdge = new Vector2(transform.position.x, collider2D.bounds.center.y - collider2D.bounds.extents.y);
+        Collider2D finishPlatformCollider2D = finishPlatform.GetComponent<Collider2D>();
+        Vector2 topFinishPlatformCollider2DEdge = new Vector2(finishPlatform.transform.position.x, 
+            finishPlatformCollider2D.bounds.center.y + finishPlatformCollider2D.bounds.extents.y);
+
+        if (bottomCollider2DEdge.y - topFinishPlatformCollider2DEdge.y < 0.01)
+        {
+            //transform.position = new Vector3(transform.position.x, topStartPlatformCollider2DEdge.y + spriteHeight / 2, transform.position.z);
+            transform.Translate(Vector3.up * currentSpeed);
+            currentSpeed = 0;
+        }
+    }
 
 
     void SetPlayingVariables(){
@@ -194,6 +222,7 @@ public class PlayerController : MonoBehaviour
         switch (currentState)
         {
             case States.START:
+            case States.FINISH:
                 if (Input.GetKey("d") || sideSpeed > 0.01)
                 {
                     animator.SetBool("isRunningLeft", false);
@@ -248,6 +277,14 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.tag == "Platform" || collision.gameObject.tag == "StartPlatform")
         {
             HandleJumping();
+        }
+        else if (collision.gameObject.tag == "FinishPlatform" && currentSpeed > 0)
+        {
+            currentState = States.FINISH;
+        }
+        else if (collision.gameObject.tag == "RocketFinish" && currentState == States.FINISH)
+        {
+            print("FINISH!");
         }
         isInCollision = true;
     }
