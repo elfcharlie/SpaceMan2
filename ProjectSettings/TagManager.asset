@@ -10,6 +10,7 @@ TagManager:
   - FinishPlatform
   - Rocket
   - RocketFinish
+  - FinishTrigger
   layers:
   - Default
   - TransparentFX

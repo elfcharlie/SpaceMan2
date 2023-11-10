@@ -268,6 +268,14 @@ public class PlayerController : MonoBehaviour
         } 
     }
 
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.gameObject.tag == "FinishTrigger" && currentState == States.FINISH)
+        {
+            print("FINISH!");
+        }
+    }
+
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (isInCollision)
@@ -282,10 +290,7 @@ public class PlayerController : MonoBehaviour
         {
             currentState = States.FINISH;
         }
-        else if (collision.gameObject.tag == "RocketFinish" && currentState == States.FINISH)
-        {
-            print("FINISH!");
-        }
+
         isInCollision = true;
     }
 
